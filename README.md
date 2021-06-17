@@ -22,7 +22,14 @@ Below will describe the flow of the application `master`
 
 Unifiers implementation can be found in [unifiers.py](unifier.py) file
 
+Currently implemented unifiers:
+  - CSVUnifier
+
 Exporters implementation can be found in [exporters.py](exporter.py) file
+
+Currently implemented exporters:
+  - CSVExporter
+  - JSONExporter
 
 Application is configuring using [config.py](config.py),
 where are defined:
