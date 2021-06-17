@@ -55,7 +55,6 @@ class UApp:
     def flow(self):
         """
         Flow implementation
-        :return: None
         """
         ret = self.import_files("input/bank*.csv")
         if ret:

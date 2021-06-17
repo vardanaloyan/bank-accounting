@@ -2,7 +2,7 @@
 In this module we define our Unifiers
 Currently implemented:
     1. CSVUnifier class
-        which unifies csf files
+        which unifies csv files
 """
 import csv
 import logging
@@ -12,12 +12,12 @@ import config
 logger = logging.getLogger(__name__)
 
 
-class Unifier(object):
+class Unifier:
     """
     Factory class
     Methods defined in this class, should be implemented in each of Unifier classes
     """
-    def __new__(cls, input_type, files=None):
+    def __new__(cls, input_type, files: list = None):
         input_type = input_type.lower()
         if input_type == "csv":
             return CSVUnifier(files)
@@ -102,6 +102,29 @@ class CSVUnifier:
             logger.error(traceback.format_exc())
             return False, [], {}
 
+    def uniform_files(self, files: list) -> list:
+        """
+        Executing the mapping, Uniforming files and output new list of uniformed files
+        :param files: parsed files-> [content, mapping]
+        :return: uniformed files
+        """
+        uniformed_files = []
+        for parsed_file in files:
+            uniformed_rows = self.make_uniform_file(parsed_file[0], parsed_file[1])
+            uniformed_files.append(uniformed_rows)
+        return uniformed_files
+
+    def unify_files(self, uniformed_files: list) -> list:
+        """
+        Function unifies files
+        :param uniformed_files: list of uniformed files
+        :return: unified files
+        """
+        self.__unified_files = []
+        for content in uniformed_files:
+            self.__unified_files.extend(content)
+        return self.__unified_files
+
     @staticmethod
     def match_file_with_bank(headers: list) -> dict:
         """
@@ -113,18 +136,6 @@ class CSVUnifier:
         for bank, scheme in config.BANK_SCHEMES.items():
             if set(headers) == scheme:
                 return config.MAPPING_RULE[bank]
-
-    def uniform_files(self, files):
-        """
-        Executing the mapping, Uniforming files and output new list of uniformed files
-        :param files: parsed files-> [content, mapping]
-        :return: uniformed files
-        """
-        uniformed_files = []
-        for parsed_file in files:
-            uniformed_rows = self.make_uniform_file(parsed_file[0], parsed_file[1])
-            uniformed_files.append(uniformed_rows)
-        return uniformed_files
 
     @staticmethod
     def make_uniform_file(rows: list, mapping: dict) -> list:
@@ -148,18 +159,12 @@ class CSVUnifier:
             uniformed_rows.append(new_row)
         return uniformed_rows
 
-    def unify_files(self, uniformed_files):
-        self.__unified_files = []
-        for content in uniformed_files:
-            self.__unified_files.extend(content)
-        return self.__unified_files
-
 
 class JSONUnifier:
     """
     JSONUnifier class: for unifying csv input files
     """
-    def __init__(self, files_paths=None):
+    def __init__(self, files_paths: list = None):
         self.files_paths = files_paths
         self.__unified_files = []
 
@@ -171,7 +176,7 @@ class XMLUnifier:
     """
     XMLUnifier class: for unifying csv input files
     """
-    def __init__(self, files_paths=None):
+    def __init__(self, files_paths: list = None):
         self.files_paths = files_paths
         self.__unified_files = []
 
