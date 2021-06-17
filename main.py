@@ -1,99 +1,73 @@
 """
-Unifier module for bank accounting
+Unifier Application (UApp) for bank accounting
 """
-import csv
 import glob
 import logging
-
-import config
+from exporter import CSVExporter, JSONExporter
+from unifier import Unifier
 
 logger = logging.getLogger(__name__)
 
-class Unifier:
+
+class UApp:
     """
-    Unifier class
+    Unifier Application class
     """
     def __init__(self):
         self.__imported_files = None
         self.__uniformed_files = []
+        self.input_type = None
+        self.unifier_object = None
 
     def __repr__(self):
         return 'Unifier object'
 
     def import_files(self, glob_pattern: str) -> bool:
+        """
+        Function for importing files for unifying using glob pattern format
+        Inside the function we guess the input file type, by analyzing glob pattern
+        using str.endswith function.
+        :param glob_pattern: str
+        :return: bool
+
+        .. todo:: Implement better algorithm for guessing the file type
+
+        """
         self.__imported_files = glob.glob(glob_pattern)
-
-    def parse_imported_files(self):
-        files = []
-        if self.__imported_files:
-            for file_path in self.__imported_files:
-                resp = self.parse_input_file(file_path)
-                if not resp[0]:
-                    logger.error(f"Unable to parse file '{file_path}'")
-                    raise Exception(f"Unable to parse file '{file_path}'")
-                files.append((resp[1], resp[2]))
+        if glob_pattern.lower().endswith(".csv"):
+            self.input_type = "csv"
         else:
-            logger.warning("Please import files")
-        return files
+            self.input_type = None
+        if len(self.__imported_files) == 0 or self.input_type is None:  # in case of not implemented or Absence of files
+            logger.warning("Please import (allowed) files")
+            return False
+        return True
 
-    def uniform_files(self, files):
-        for parsed_file in files:
-            uniformed_rows = self.make_uniform_csv(parsed_file[0], parsed_file[1])
-            self.accumulate(uniformed_rows)
-
-    def parse_input_file(self, file_path: str) -> tuple:
-        if file_path.endswith(".csv"):
-            return self.parse_csv_file(file_path)
-        else:
-            raise Exception("Waiting for csv extension files")
-
-    def parse_csv_file(self, file_path):
-        with open(file_path) as f:
-            reader = list(csv.DictReader(f))
-            if reader:
-                headers = list(reader[0].keys())
-            else:
-                headers = []
-            mapping = self.match_csv_with_bank(headers)
-            return True, reader, mapping
-
-    @staticmethod
-    def match_csv_with_bank(headers: list) -> dict:
-        for bank, scheme in config.BANK_SCHEMES.items():
-            if set(headers) == scheme:
-                return config.MAPPING_RULE[bank]
-
-    @staticmethod
-    def make_uniform_csv(rows: list, mapping: dict) -> list:
-        uniformed_rows = []
-        for row in rows:
-            new_row = {}
-            for mkey, mval in mapping.items():
-                if isinstance(mval, str):
-                    new_row[mkey] = row[mval]
-                else:
-                    new_row[mkey] = mval(row)
-            uniformed_rows.append(new_row)
-        return uniformed_rows
-
-    def accumulate(self, uniformed_file):
-        self.__uniformed_files.extend(uniformed_file)
-
-    def export(self, filename, fmt):
-        if fmt == "csv":
-            header = self.__uniformed_files[0].keys()
-            with open(filename, 'w', newline='') as output_file:
-                dict_writer = csv.DictWriter(output_file, header)
-                dict_writer.writeheader()
-                dict_writer.writerows(self.__uniformed_files)
+    def create_unifier(self, input_type: str) -> Unifier:
+        """
+        Function is part of Factory method design pattern implementation.
+        It accepts input_type parameter and creates relevant class
+        :param input_type: "csv"
+        :return: Unifier object
+        """
+        return Unifier(input_type, self.__imported_files)
 
     def flow(self):
-        self.import_files("input/bank*.csv")
-        files = self.parse_imported_files()
-        self.uniform_files(files)
-        self.export("output/out.csv", "csv")
+        """
+        Flow implementation
+        :return: None
+        """
+        ret = self.import_files("input/bank*.csv")
+        if ret:
+            unifier = self.create_unifier(self.input_type)
+            parsed_files = unifier.parse_files()
+            uniformed_files = unifier.uniform_files(parsed_files)
+            unified_files = unifier.unify_files(uniformed_files)
+            out_writer = CSVExporter(filename="output/output.csv")
+            # out_writer = JSONExporter(filename="output/output.json")
+            out_writer.export(unified_files)
 
 
 if __name__ == "__main__":
-    a = Unifier()
+    a = UApp()
     a.flow()
