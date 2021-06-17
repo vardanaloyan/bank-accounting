@@ -1,4 +1,5 @@
 ## Unifier Application (UApp) for bank accounting
+Application is a solution of the [assessment](https://gist.github.com/Attumm/3927bfab39b32d401dc0a4ca8db995bd)
 
 Below will describe the flow of the application
 
