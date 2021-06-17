@@ -1,0 +1,44 @@
+[
+    {
+        "date": "01-10-2019",
+        "transaction": "remove",
+        "amount": "99.20",
+        "from": "198",
+        "to": "182"
+    },
+    {
+        "date": "02-10-2019",
+        "transaction": "add",
+        "amount": "2000.10",
+        "from": "188",
+        "to": "198"
+    },
+    {
+        "date": "03-10-2019",
+        "transaction": "remove",
+        "amount": "99.40",
+        "from": "198",
+        "to": "182"
+    },
+    {
+        "date": "04-10-2019",
+        "transaction": "add",
+        "amount": "2123.50",
+        "from": "188",
+        "to": "198"
+    },
+    {
+        "date": "05-10-2019",
+        "transaction": "remove",
+        "amount": "5.07",
+        "from": "198",
+        "to": "182"
+    },
+    {
+        "date": "06-10-2019",
+        "transaction": "add",
+        "amount": "1060.08",
+        "from": "188",
+        "to": "198"
+    }
+]
