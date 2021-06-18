@@ -162,7 +162,7 @@ class CSVUnifier:
 
 class JSONUnifier:
     """
-    JSONUnifier class: for unifying csv input files
+    JSONUnifier class: for unifying json input files
     """
     def __init__(self, files_paths: list = None):
         self.files_paths = files_paths
@@ -174,7 +174,7 @@ class JSONUnifier:
 
 class XMLUnifier:
     """
-    XMLUnifier class: for unifying csv input files
+    XMLUnifier class: for unifying xml input files
     """
     def __init__(self, files_paths: list = None):
         self.files_paths = files_paths
